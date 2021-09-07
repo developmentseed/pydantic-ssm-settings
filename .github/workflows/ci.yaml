@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "**"
+  pull_request: {}
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: set up python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: install
+        run: |
+          make install-linting
+          pip freeze
+
+      - name: lint
+        run: make lint
+
+      - name: mypy
+        run: make mypy
