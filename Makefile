@@ -3,7 +3,7 @@ isort = isort pydantic_ssm_settings tests
 black = black -S -l 120 --target-version py38 pydantic_ssm_settings tests
 
 .PHONY: install-linting
-install-linting:
+install-linting: install-pydantic_ssm_settings
 	pip install -r tests/requirements-linting.txt
 
 .PHONY: install-pydantic_ssm_settings
