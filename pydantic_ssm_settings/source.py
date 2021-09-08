@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class AwsSsmSettingsSource:
     __slots__ = ("ssm_prefix",)
 
-    def __init__(self, ssm_prefix):
+    def __init__(self, ssm_prefix: Union[Path, str, None]):
         self.ssm_prefix: Union[Path, str, None] = ssm_prefix
 
     def __call__(self, settings: BaseSettings) -> Dict[str, Any]:

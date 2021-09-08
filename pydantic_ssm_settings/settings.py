@@ -1,7 +1,7 @@
 import logging
 from typing import Tuple
 
-from pydantic.env_settings import SettingsSourceCallable
+from pydantic.env_settings import EnvSettingsSource, InitSettingsSource, SecretsSettingsSource, SettingsSourceCallable
 
 from .source import AwsSsmSettingsSource
 
@@ -12,9 +12,9 @@ class AwsSsmSourceConfig:
     @classmethod
     def customise_sources(
         cls,
-        init_settings: SettingsSourceCallable,
-        env_settings: SettingsSourceCallable,
-        file_secret_settings: SettingsSourceCallable,
+        init_settings: InitSettingsSource,
+        env_settings: EnvSettingsSource,
+        file_secret_settings: SecretsSettingsSource,
     ) -> Tuple[SettingsSourceCallable, ...]:
 
         return (
