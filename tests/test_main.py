@@ -1,8 +1,8 @@
 import logging
 
 import pytest
-from pydantic import BaseSettings
 
+from pydantic import BaseSettings
 from pydantic_ssm_settings import AwsSsmSourceConfig
 
 logger = logging.getLogger("pydantic_ssm_settings")
