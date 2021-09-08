@@ -16,6 +16,6 @@ def aws_credentials():
 
 
 @pytest.fixture(scope="function")
-def ssm():
+def ssm(aws_credentials):
     with mock_ssm():
         yield boto3.client("ssm")
