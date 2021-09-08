@@ -18,6 +18,7 @@ def lazy_parameter(path, field):  # noqa: C901
         def value(self):
             logger.debug(f"Fetching {path}")
             client = boto3.client("ssm")
+            # TODO: Fallback to field default if no value is available...
             response = client.get_parameter(Name=str(path), WithDecryption=True)
             value = response["Parameter"]["Value"]
             return field.type_(value)
