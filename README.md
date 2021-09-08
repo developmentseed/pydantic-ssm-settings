@@ -1,6 +1,6 @@
 # pydantic-ssm-settings
 
-Replace Pydantic's builtin secret support [Secret Support](https://pydantic-docs.helpmanual.io/usage/settings/#secret-support) with an implementation that loads parameters from [AWS Systems Manager Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html). Parameters are loaded _lazily_, meaning that they are only requested from AWS if they are not provided via [standard field value priority](https://pydantic-docs.helpmanual.io/usage/settings/#field-value-priority) (i.e. initialiser, environment variable, or via `.env` file).
+Replace Pydantic's builtin [Secret Support](https://pydantic-docs.helpmanual.io/usage/settings/#secret-support) with a configuration provider that loads parameters from [AWS Systems Manager Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html). Parameters are loaded _lazily_, meaning that they are only requested from AWS if they are not provided via [standard field value priority](https://pydantic-docs.helpmanual.io/usage/settings/#field-value-priority) (i.e. initialiser, environment variable, or via `.env` file).
 
 ## Usage
 
