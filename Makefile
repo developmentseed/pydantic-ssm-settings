@@ -28,13 +28,13 @@ install-testing: install-pydantic_ssm_settings
 install: install-testing install-linting # install-docs
 	@echo 'installed development requirements'
 
-# .PHONY: build-trace
-# build-trace:
-# 	python setup.py build_ext --force --inplace --define CYTHON_TRACE
+.PHONY: build-trace
+build-trace:
+	python setup.py build_ext --force --inplace --define CYTHON_TRACE
 
-# .PHONY: build
-# build:
-# 	python setup.py build_ext --inplace
+.PHONY: build
+build:
+	python setup.py build_ext --inplace
 
 .PHONY: format
 format:
@@ -59,18 +59,17 @@ mypy:
 
 .PHONY: test
 test:
-	# pytest --cov=pydantic_ssm_settings
-	pytest
+	pytest --cov=pydantic_ssm_settings
 
 .PHONY: testcov
 testcov: test
 	@echo "building coverage html"
 	@coverage html
 
-.PHONY: testcov-compile
-testcov-compile: build-trace test
-	@echo "building coverage html"
-	@coverage html
+# .PHONY: testcov-compile
+# testcov-compile: build-trace test
+# 	@echo "building coverage html"
+# 	@coverage html
 
 # .PHONY: test-examples
 # test-examples:
@@ -121,19 +120,19 @@ clean:
 	rm -rf codecov.sh
 	rm -rf coverage.xml
 
-.PHONY: docs
-docs:
-	flake8 --max-line-length=80 docs/examples/
-	python docs/build/main.py
-	mkdocs build
+# .PHONY: docs
+# docs:
+# 	flake8 --max-line-length=80 docs/examples/
+# 	python docs/build/main.py
+# 	mkdocs build
 
-.PHONY: docs-serve
-docs-serve:
-	python docs/build/main.py
-	mkdocs serve
+# .PHONY: docs-serve
+# docs-serve:
+# 	python docs/build/main.py
+# 	mkdocs serve
 
-.PHONY: publish-docs
-publish-docs:
-	zip -r site.zip site
-	@curl -H "Content-Type: application/zip" -H "Authorization: Bearer ${NETLIFY}" \
-	      --data-binary "@site.zip" https://api.netlify.com/api/v1/sites/pydantic-docs.netlify.com/deploys
+# .PHONY: publish-docs
+# publish-docs:
+# 	zip -r site.zip site
+# 	@curl -H "Content-Type: application/zip" -H "Authorization: Bearer ${NETLIFY}" \
+# 	      --data-binary "@site.zip" https://api.netlify.com/api/v1/sites/pydantic-docs.netlify.com/deploys

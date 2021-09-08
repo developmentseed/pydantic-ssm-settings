@@ -30,3 +30,40 @@ jobs:
 
       - name: mypy
         run: make mypy
+
+  test-linux:
+    name: test py${{ matrix.python-version }} on linux
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # python-version: ["3.6", "3.7", "3.8", "3.9"]
+        python-version: ["3.8"]
+    env:
+      PYTHON: ${{ matrix.python-version }}
+      OS: ubuntu
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: set up python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: install
+        run: |
+          make install-testing
+          pip freeze
+      
+      - name: test uncompiled without deps
+        run: make test
+        env:
+          COVERAGE_FILE: coverage/.coverage.linux-py${{ matrix.python-version }}-cN-dN
+          CONTEXT: linux-py${{ matrix.python-version }}-compiled-no-deps-no
+
+      - name: store coverage files
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage
+          path: coverage
