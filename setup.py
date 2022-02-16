@@ -5,7 +5,7 @@ with open("README.md") as f:
 
 setup(
     name="pydantic-ssm-settings",
-    description="A Pydantic configuration provider for AWS SSM Parameter STore.",
+    description="A Pydantic configuration provider for AWS SSM Parameter Store.",
     long_description=desc,
     long_description_content_type="text/markdown",
     python_requires=">=3.8",
@@ -18,8 +18,8 @@ setup(
     ],
     keywords="Pydantic AWS SSM Parameter Store",
     author=u"Anthony Lukach",
-    author_email="anthony@developmentseed.rg",
-    url="https://github.com/stac-utils/stac-fastapi",
+    author_email="anthony@developmentseed.org",
+    url="https://github.com/developmentseed/pydantic-ssm-settings",
     license="MIT",
     packages=find_namespace_packages(exclude=["tests"]),
     zip_safe=False,
@@ -27,5 +27,9 @@ setup(
         "pydantic",
     ],
     extras_require={"cli": ["boto3", "click", "python-dotenv"]},
-    console_scripts=["scripts/dotenv-to-ssm"],
+    entry_points={
+        "console_scripts": [
+            "dotenv-to-ssm = dotenv_to_ssm:load [cli]",
+        ]
+    },
 )
