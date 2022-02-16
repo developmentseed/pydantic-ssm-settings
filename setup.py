@@ -26,4 +26,6 @@ setup(
     install_requires=[
         "pydantic",
     ],
+    extras_require={"cli": ["boto3", "click", "python-dotenv"]},
+    console_scripts=["scripts/dotenv-to-ssm"],
 )
