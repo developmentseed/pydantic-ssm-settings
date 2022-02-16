@@ -48,7 +48,3 @@ def load(dotenv_file: click.Path, prefix: click.Path, **kwargs):
             error_text = textwrap.indent(str(e), prefix="\t")
             print(f"Failed to create {path}: \n{error_text}")
             print(kwargs)
-
-
-if __name__ == "__main__":
-    load()
