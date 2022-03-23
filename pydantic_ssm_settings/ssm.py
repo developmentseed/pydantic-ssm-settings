@@ -3,6 +3,7 @@ from functools import cached_property
 from pathlib import Path
 from typing import Any
 
+import botocore
 import boto3
 
 from pydantic.fields import ModelField
@@ -22,8 +23,13 @@ def lazy_parameter(path: Path, field: ModelField) -> Any:  # noqa: C901
         def value(self) -> Any:
             logger.debug(f"Fetching {path}")
             client = boto3.client("ssm")
-            # TODO: Fallback to field default if no value is available...
-            response = client.get_parameter(Name=str(path), WithDecryption=True)
+            try:
+                response = client.get_parameter(Name=str(path), WithDecryption=True)
+            except botocore.exceptions.ClientError as error:
+                if (error.response['Error']['Code'] == 'ParameterNotFound'):
+                    return field.default
+                else:
+                    raise error
             value = response["Parameter"]["Value"]
             return field.type_(value)
 
