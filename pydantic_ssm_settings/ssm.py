@@ -3,8 +3,8 @@ from functools import cached_property
 from pathlib import Path
 from typing import Any
 
-import botocore
 import boto3
+import botocore
 
 from pydantic.fields import ModelField
 
