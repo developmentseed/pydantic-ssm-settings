@@ -26,7 +26,7 @@ def lazy_parameter(path: Path, field: ModelField) -> Any:  # noqa: C901
             try:
                 response = client.get_parameter(Name=str(path), WithDecryption=True)
             except botocore.exceptions.ClientError as error:
-                if (error.response['Error']['Code'] == 'ParameterNotFound'):
+                if error.response['Error']['Code'] == 'ParameterNotFound':
                     return field.default
                 else:
                     raise error
