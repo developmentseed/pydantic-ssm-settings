@@ -18,8 +18,8 @@ class AwsSsmSourceConfig:
     ) -> Tuple[SettingsSourceCallable, ...]:
 
         return (
-            env_settings,
             init_settings,
+            env_settings,
             # Usurping the `secrets_dir` arg. We can't expect any other args to
             # be passed to # the Settings module because Pydantic will complain
             # about unexpected arguments. `secrets_dir` comes from `_secrets_dir`,
