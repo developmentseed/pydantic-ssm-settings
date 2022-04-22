@@ -2,9 +2,8 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
+import boto3
 from pydantic import BaseSettings
-
-from .ssm import lazy_parameter
 
 logger = logging.getLogger(__name__)
 
@@ -15,12 +14,16 @@ class AwsSsmSettingsSource:
     def __init__(self, ssm_prefix: Union[Path, str, None]):
         self.ssm_prefix: Union[Path, str, None] = ssm_prefix
 
+    @property
+    def client(self):
+        return boto3.client("ssm")
+
     def __call__(self, settings: BaseSettings) -> Dict[str, Any]:
         """
         Returns lazy SSM values for all settings.
         """
         secrets: Dict[str, Optional[Any]] = {}
-
+        
         if self.ssm_prefix is None:
             return secrets
 
@@ -31,10 +34,11 @@ class AwsSsmSettingsSource:
 
         logger.debug(f"Building SSM settings with prefix of {secrets_path=}")
 
-        for field in settings.__fields__.values():
-            for env_name in field.field_info.extra["env_names"]:
-                secrets[field.alias] = lazy_parameter(path=(secrets_path / env_name), field=field)
-        return secrets
+        params = self.client.get_parameters_by_path(Path=str(secrets_path), WithDecryption=True)['Parameters']
+
+        return {
+            str(Path(param['Name']).relative_to(secrets_path)): param['Value'] for param in params 
+        }
 
     def __repr__(self) -> str:
         return f"AwsSsmSettingsSource(ssm_prefix={self.ssm_prefix!r})"
