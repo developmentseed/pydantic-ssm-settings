@@ -17,7 +17,7 @@ setup(
         "License :: OSI Approved :: MIT License",
     ],
     keywords="Pydantic AWS SSM Parameter Store",
-    author=u"Anthony Lukach",
+    author="Anthony Lukach",
     author_email="anthony@developmentseed.rg",
     url="https://github.com/stac-utils/stac-fastapi",
     license="MIT",

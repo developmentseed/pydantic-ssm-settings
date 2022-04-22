@@ -35,12 +35,13 @@ def test_lookup_from_ssm(ssm):
     assert settings.foo == "xyz123"
 
 
-def test_prefer_provided():
+def test_prefer_provided(ssm):
     settings = SimpleSettings(_secrets_dir="/asdf", foo="manually set")
     assert settings.foo == "manually set"
 
 
 def test_casting(ssm):
+    ssm.put_parameter(Name="/asdf/foo", Value="xyz123")
     ssm.put_parameter(Name="/asdf/bar", Value="99")
     settings = IntSettings(_secrets_dir="/asdf")
     assert settings.bar == 99

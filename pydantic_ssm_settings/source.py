@@ -1,9 +1,14 @@
 import logging
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 import boto3
-from pydantic import BaseSettings
+
+from pydantic import BaseSettings, typing
+
+if TYPE_CHECKING:
+    from mypy_boto3_ssm.client import SSMClient
+
 
 logger = logging.getLogger(__name__)
 
@@ -11,11 +16,11 @@ logger = logging.getLogger(__name__)
 class AwsSsmSettingsSource:
     __slots__ = ("ssm_prefix",)
 
-    def __init__(self, ssm_prefix: Union[Path, str, None]):
-        self.ssm_prefix: Union[Path, str, None] = ssm_prefix
+    def __init__(self, ssm_prefix: Union[typing.StrPath, None]):
+        self.ssm_prefix: Union[typing.StrPath, None] = ssm_prefix
 
     @property
-    def client(self):
+    def client(self) -> "SSMClient":
         return boto3.client("ssm")
 
     def __call__(self, settings: BaseSettings) -> Dict[str, Any]:
@@ -23,7 +28,7 @@ class AwsSsmSettingsSource:
         Returns lazy SSM values for all settings.
         """
         secrets: Dict[str, Optional[Any]] = {}
-        
+
         if self.ssm_prefix is None:
             return secrets
 
@@ -34,10 +39,13 @@ class AwsSsmSettingsSource:
 
         logger.debug(f"Building SSM settings with prefix of {secrets_path=}")
 
-        params = self.client.get_parameters_by_path(Path=str(secrets_path), WithDecryption=True)['Parameters']
+        params = self.client.get_parameters_by_path(
+            Path=str(secrets_path), WithDecryption=True
+        )["Parameters"]
 
         return {
-            str(Path(param['Name']).relative_to(secrets_path)): param['Value'] for param in params 
+            str(Path(param["Name"]).relative_to(secrets_path)): param["Value"]
+            for param in params
         }
 
     def __repr__(self) -> str:

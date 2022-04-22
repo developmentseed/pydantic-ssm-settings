@@ -1,7 +1,12 @@
 import logging
 from typing import Tuple
 
-from pydantic.env_settings import EnvSettingsSource, InitSettingsSource, SecretsSettingsSource, SettingsSourceCallable
+from pydantic.env_settings import (
+    EnvSettingsSource,
+    InitSettingsSource,
+    SecretsSettingsSource,
+    SettingsSourceCallable,
+)
 
 from .source import AwsSsmSettingsSource
 

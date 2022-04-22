@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := all
 isort = isort pydantic_ssm_settings tests
-black = black -S -l 120 --target-version py38 pydantic_ssm_settings tests
+black = black --target-version py38 pydantic_ssm_settings tests
 
 .PHONY: install-linting
 install-linting: install-pydantic_ssm_settings
@@ -46,16 +46,13 @@ lint:
 	flake8 pydantic_ssm_settings/ tests/
 	$(isort) --check-only --df
 	$(black) --check --diff
+	mypy
 
 # .PHONY: check-dist
 # check-dist:
 # 	python setup.py check -ms
 # 	SKIP_CYTHON=1 python setup.py sdist
 # 	twine check dist/*
-
-.PHONY: mypy
-mypy:
-	mypy pydantic_ssm_settings
 
 .PHONY: test
 test:

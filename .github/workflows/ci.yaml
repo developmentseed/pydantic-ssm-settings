@@ -16,20 +16,23 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: set up python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: 3.9
+          cache: 'pip'
 
       - name: install
         run: |
           make install-linting
           pip freeze
 
-      - name: lint
-        run: make lint
-
-      - name: mypy
-        run: make mypy
+      - name: run linters
+        uses: wearerequired/lint-action@v1
+        with:
+          black: true
+          flake8: true
+          mypy: true
+          mypy_args: pydantic_ssm_settings
 
   test-linux:
     name: test py${{ matrix.python-version }} on linux
