@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
+from botocore.exceptions import ClientError
 from botocore.client import Config
 import boto3
 
@@ -46,9 +47,13 @@ class AwsSsmSettingsSource:
 
         logger.debug(f"Building SSM settings with prefix of {secrets_path=}")
 
-        params = self.client.get_parameters_by_path(
-            Path=str(secrets_path), WithDecryption=True
-        )["Parameters"]
+        try:
+            params = self.client.get_parameters_by_path(
+                Path=str(secrets_path), WithDecryption=True
+            )["Parameters"]
+        except ClientError:
+            logger.exception("Failed to get parameters from %s", secrets_path)
+            return {}
 
         return {
             str(Path(param["Name"]).relative_to(secrets_path)): param["Value"]
