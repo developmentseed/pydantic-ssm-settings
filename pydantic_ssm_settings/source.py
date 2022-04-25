@@ -27,7 +27,7 @@ class AwsSsmSettingsSource:
         return boto3.client("ssm", config=self.client_config)
 
     @property
-    def client_config(self):
+    def client_config(self) -> Config:
         timeout = float(os.environ.get("SSM_TIMEOUT", 0.5))
         return Config(connect_timeout=timeout, read_timeout=timeout)
 
