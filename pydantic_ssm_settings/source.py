@@ -1,7 +1,10 @@
+import os
 import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
+from botocore.exceptions import ClientError
+from botocore.client import Config
 import boto3
 
 from pydantic import BaseSettings, typing
@@ -21,7 +24,12 @@ class AwsSsmSettingsSource:
 
     @property
     def client(self) -> "SSMClient":
-        return boto3.client("ssm")
+        return boto3.client("ssm", config=self.client_config)
+
+    @property
+    def client_config(self):
+        timeout = float(os.environ.get("SSM_TIMEOUT", 0.5))
+        return Config(connect_timeout=timeout, read_timeout=timeout)
 
     def __call__(self, settings: BaseSettings) -> Dict[str, Any]:
         """
@@ -39,9 +47,13 @@ class AwsSsmSettingsSource:
 
         logger.debug(f"Building SSM settings with prefix of {secrets_path=}")
 
-        params = self.client.get_parameters_by_path(
-            Path=str(secrets_path), WithDecryption=True
-        )["Parameters"]
+        try:
+            params = self.client.get_parameters_by_path(
+                Path=str(secrets_path), WithDecryption=True
+            )["Parameters"]
+        except ClientError:
+            logger.exception("Failed to get parameters from %s", secrets_path)
+            return {}
 
         return {
             str(Path(param["Name"]).relative_to(secrets_path)): param["Value"]
