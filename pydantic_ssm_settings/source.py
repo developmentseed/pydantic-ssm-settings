@@ -1,7 +1,9 @@
+import os
 import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
+from botocore.client import Config
 import boto3
 
 from pydantic import BaseSettings, typing
@@ -21,7 +23,12 @@ class AwsSsmSettingsSource:
 
     @property
     def client(self) -> "SSMClient":
-        return boto3.client("ssm")
+        return boto3.client("ssm", config=self.client_config)
+
+    @property
+    def client_config(self):
+        timeout = float(os.environ.get("SSM_TIMEOUT", 0.5))
+        return Config(connect_timeout=timeout, read_timeout=timeout)
 
     def __call__(self, settings: BaseSettings) -> Dict[str, Any]:
         """
