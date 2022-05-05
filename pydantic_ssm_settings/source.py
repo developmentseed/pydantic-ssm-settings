@@ -1,7 +1,7 @@
 import os
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from botocore.exceptions import ClientError
 from botocore.client import Config
@@ -20,7 +20,7 @@ class AwsSsmSettingsSource:
     __slots__ = ("ssm_prefix",)
 
     def __init__(self, ssm_prefix: Union[typing.StrPath, None]):
-        self.ssm_prefix: Union[typing.StrPath, None] = ssm_prefix
+        self.ssm_prefix: Optional[typing.StrPath] = ssm_prefix
 
     @property
     def client(self) -> "SSMClient":
@@ -48,17 +48,20 @@ class AwsSsmSettingsSource:
         logger.debug(f"Building SSM settings with prefix of {secrets_path=}")
 
         try:
-            params = self.client.get_parameters_by_path(
-                Path=str(secrets_path), WithDecryption=True
-            )["Parameters"]
+            paginator = self.client.get_paginator('get_parameters_by_path')
+            response_iterator = paginator.paginate(Path=str(secrets_path), WithDecryption=True)
+
+            result = {
+                str(Path(parameter["Name"]).relative_to(secrets_path)): parameter["Value"]
+                for page in response_iterator
+                for parameter in page['Parameters']
+            }
+                    
         except ClientError:
             logger.exception("Failed to get parameters from %s", secrets_path)
             return {}
 
-        return {
-            str(Path(param["Name"]).relative_to(secrets_path)): param["Value"]
-            for param in params
-        }
+        return result
 
     def __repr__(self) -> str:
         return f"AwsSsmSettingsSource(ssm_prefix={self.ssm_prefix!r})"
