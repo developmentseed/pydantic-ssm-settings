@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class AwsSsmSettingsSource:
     __slots__ = ("ssm_prefix",)
 
-    def __init__(self, ssm_prefix: Union[typing.StrPath, None]):
+    def __init__(self, ssm_prefix: Optional[typing.StrPath]):
         self.ssm_prefix: Optional[typing.StrPath] = ssm_prefix
 
     @property
