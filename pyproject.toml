@@ -1,0 +1,4 @@
+[tool.semantic_release]
+# https://python-semantic-release.readthedocs.io/en/latest/configuration.html
+branch = "main"
+version_variable = "pydantic_ssm_settings/__init__.py:__version__"
