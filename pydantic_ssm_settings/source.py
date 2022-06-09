@@ -51,7 +51,7 @@ class AwsSsmSettingsSource:
             paginator = self.client.get_paginator('get_parameters_by_path')
             response_iterator = paginator.paginate(Path=str(secrets_path), WithDecryption=True)
 
-            result = {
+            return {
                 str(Path(parameter["Name"]).relative_to(secrets_path)): parameter["Value"]
                 for page in response_iterator
                 for parameter in page['Parameters']
@@ -60,8 +60,6 @@ class AwsSsmSettingsSource:
         except ClientError:
             logger.exception("Failed to get parameters from %s", secrets_path)
             return {}
-
-        return result
 
     def __repr__(self) -> str:
         return f"AwsSsmSettingsSource(ssm_prefix={self.ssm_prefix!r})"
