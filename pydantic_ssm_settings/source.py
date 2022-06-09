@@ -48,15 +48,17 @@ class AwsSsmSettingsSource:
         logger.debug(f"Building SSM settings with prefix of {secrets_path=}")
 
         try:
-            paginator = self.client.get_paginator('get_parameters_by_path')
-            response_iterator = paginator.paginate(Path=str(secrets_path), WithDecryption=True)
+            paginator = self.client.get_paginator("get_parameters_by_path")
+            response_iterator = paginator.paginate(
+                Path=str(secrets_path), WithDecryption=True
+            )
 
-            return {
-                str(Path(parameter["Name"]).relative_to(secrets_path)): parameter["Value"]
-                for page in response_iterator
-                for parameter in page['Parameters']
-            }
-                    
+            output = {}
+            for page in response_iterator:
+                for parameter in page["Parameters"]:
+                    key = Path(parameter["Name"]).relative_to(secrets_path).as_posix()
+                    output[key] = parameter["Value"]
+
         except ClientError:
             logger.exception("Failed to get parameters from %s", secrets_path)
             return {}
