@@ -56,8 +56,13 @@ class AwsSsmSettingsSource:
             output = {}
             for page in response_iterator:
                 for parameter in page["Parameters"]:
-                    key = Path(parameter["Name"]).relative_to(secrets_path).as_posix()
+                    key = (
+                        Path(parameter["Name"])
+                        .relative_to(secrets_path)
+                        .as_posix()
+                    )
                     output[key] = parameter["Value"]
+            return output
 
         except ClientError:
             logger.exception("Failed to get parameters from %s", secrets_path)
