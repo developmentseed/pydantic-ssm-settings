@@ -28,7 +28,7 @@ jobs:
           cache: "poetry"
 
       - name: Python Semantic Release
-        uses: relekang/python-semantic-release@7
+        uses: relekang/python-semantic-release@v7.29.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           repository_username: __token__
