@@ -5,15 +5,7 @@ on:
 
 jobs:
   lint:
-    strategy:
-      fail-fast: false
-      matrix:
-        # python-version: [3.6, 3.7, 3.8, 3.9]
-        python-version: [3.8]
-        # poetry-version: [1.0, 1.1.11]
-        # os: [ubuntu-18.04, macos-latest, windows-latest]
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
 
@@ -40,8 +32,7 @@ jobs:
           mypy_args: pydantic_ssm_settings
           mypy_command_prefix: poetry run
 
-  test-linux:
-    name: test py${{ matrix.python-version }} on linux
+  test:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -75,3 +66,33 @@ jobs:
         with:
           name: coverage
           path: coverage
+
+  release:
+    name: Semantic Release
+    runs-on: ubuntu-latest
+    concurrency: push
+    if: github.ref_name == 'main'
+    needs: [test, lint]
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # You must set fetch-depth to 0 when using actions/checkout@v2, since
+          # Python Semantic Release needs access to the full history to
+          # determine whether a release should be made.
+          fetch-depth: 0
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+          cache: "poetry"
+
+      - name: Python Semantic Release
+        uses: relekang/python-semantic-release@v7.29.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          repository_username: __token__
+          repository_password: ${{ secrets.PYPI_API_TOKEN }}
