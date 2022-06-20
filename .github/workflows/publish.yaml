@@ -2,6 +2,10 @@ name: Publish
 
 on:
   push:
+    # branches:
+    #   - main
+    # tags:
+    #   - "**"
 
 jobs:
   release:
@@ -16,10 +20,10 @@ jobs:
           fetch-depth: 0
 
       - name: Set Up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
-          cache: "pip"
+          cache: "poetry"
 
       - name: Python Semantic Release
         uses: relekang/python-semantic-release@master
