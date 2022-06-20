@@ -10,27 +10,36 @@ on:
 
 jobs:
   lint:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9]
+        poetry-version: [1.0, 1.1.11]
+        os: [ubuntu-18.04, macos-latest, windows-latest]
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: set up python
-        uses: actions/setup-python@v3
+      - name: Install poetry
+        run: pipx install poetry
+
+      - uses: actions/setup-python@v4
         with:
-          python-version: 3.9
-          cache: 'pip'
+          python-version: ${{ matrix.python-version }}
+          cache: "poetry"
 
-      - name: install
-        run: |
-          make install-linting
-          pip freeze
+      - run: poetry install
+
+      - run: poetry run pytest
 
       - name: run linters
         uses: wearerequired/lint-action@v1
         with:
           black: true
+          black_args: pydantic_ssm_settings
           flake8: true
+          flake8_args: pydantic_ssm_settings
           mypy: true
           mypy_args: pydantic_ssm_settings
 
@@ -50,17 +59,14 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: set up python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+          cache: 'poetry'
 
-      - name: install
-        run: |
-          make install-testing
-          pip freeze
-      
-      - name: test uncompiled without deps
-        run: make test
+      - run: poetry install
+
+      - run: poetry run pytest
         env:
           COVERAGE_FILE: coverage/.coverage.linux-py${{ matrix.python-version }}-cN-dN
           CONTEXT: linux-py${{ matrix.python-version }}-compiled-no-deps-no
