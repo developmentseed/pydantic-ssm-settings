@@ -22,17 +22,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install poetry
-        run: pipx install poetry
-
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           cache: "poetry"
 
-      - run: poetry install
+      - name: Install poetry
+        run: pipx install poetry
 
-      - run: poetry run pytest
+      - run: poetry install
 
       - name: run linters
         uses: wearerequired/lint-action@v1
@@ -57,13 +55,15 @@ jobs:
       OS: ubuntu
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: set up python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           cache: "poetry"
+
+      - name: Install poetry
+        run: pipx install poetry
 
       - run: poetry install
 
