@@ -37,10 +37,13 @@ jobs:
         with:
           black: true
           black_args: pydantic_ssm_settings
+          black_command_prefix: poetry run
           flake8: true
           flake8_args: pydantic_ssm_settings
+          flake8_command_prefix: poetry run
           mypy: true
           mypy_args: pydantic_ssm_settings
+          mypy_command_prefix: poetry run
 
   test-linux:
     name: test py${{ matrix.python-version }} on linux
