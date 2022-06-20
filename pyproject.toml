@@ -33,6 +33,8 @@ flake9 = "^3.8.3"
 branch = "main"
 version_variable = "pydantic_ssm_settings/__init__.py:__version__"
 build_command = "poetry build"
+upload_to_pypi = true
+upload_to_release = true
 
 [tool.flake8]
 max-line-length = 90
