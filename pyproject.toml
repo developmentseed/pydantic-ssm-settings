@@ -32,7 +32,7 @@ flake9 = "^3.8.3"
 # https://python-semantic-release.readthedocs.io/en/latest/configuration.html
 branch = "main"
 version_variable = "pydantic_ssm_settings/__init__.py:__version__"
-build_command = "pip install poetry && poetry build"
+build_command = "poetry build"
 
 [tool.flake8]
 max-line-length = 90
