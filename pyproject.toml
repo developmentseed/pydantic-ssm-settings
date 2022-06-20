@@ -16,6 +16,7 @@ repository = "https://github.com/developmentseed/pydantic-ssm-settings/"
 [tool.poetry.dependencies]
 python = "^3.7"
 "boto3" = "^1.21.45"
+pydantic = "^1.6.2"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"
@@ -31,6 +32,7 @@ flake9 = "^3.8.3"
 # https://python-semantic-release.readthedocs.io/en/latest/configuration.html
 branch = "main"
 version_variable = "pydantic_ssm_settings/__init__.py:__version__"
+build_command = "pip install poetry && poetry build"
 
 [tool.flake8]
 max-line-length = 90
@@ -48,7 +50,6 @@ multi_line_output = 3
 include_trailing_comma = "true"
 force_grid_wrap = 0
 combine_as_imports = "true"
-
 
 [tool.mypy]
 files="pydantic_ssm_settings"
