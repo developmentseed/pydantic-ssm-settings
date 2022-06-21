@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.2 (2022-06-21)
+### Fix
+* Instruct semantic-releases to up version in poetry config ([`650554d`](https://github.com/developmentseed/pydantic-ssm-settings/commit/650554df56e479d64039418a0738d80901b19432))
+
 ## v0.2.1 (2022-06-21)
 ### Fix
 * Fix semantic release build command ([`13ce3c7`](https://github.com/developmentseed/pydantic-ssm-settings/commit/13ce3c7106d180c44a51462cdab497391afa21ea))
