@@ -82,14 +82,6 @@ jobs:
           # determine whether a release should be made.
           fetch-depth: 0
 
-      - name: Install poetry
-        run: pipx install poetry
-
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.9
-          cache: "poetry"
-
       - name: Python Semantic Release
         uses: relekang/python-semantic-release@v7.28.1
         with:
