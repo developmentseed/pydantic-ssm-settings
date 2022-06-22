@@ -20,6 +20,7 @@ pydantic = "^1.6.2"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"
+coverage = {extras = ["toml"], version = "^6.4.1"}
 isort = "^5.9.3"
 mypy = "^0.910"
 boto3-stubs = {extras = ["ssm"], version = "^1.21.45"}
@@ -58,3 +59,10 @@ combine_as_imports = "true"
 files="pydantic_ssm_settings"
 python_version = 3.9
 show_error_codes = "True"
+
+[tool.coverage]
+precision = 2
+range = [95, 100]
+
+[tool.coverage.comment]
+layout = "header, diff, flags, files, footer"
