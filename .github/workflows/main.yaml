@@ -56,7 +56,7 @@ jobs:
 
       - run: poetry install
 
-      - run: poetry run pytest --cov=pydantic_ssm_settings
+      - run: poetry run pytest --cov=pydantic_ssm_settings --cov-report=xml
         env:
           COVERAGE_FILE: coverage/.coverage.linux-py${{ matrix.python-version }}-cN-dN
           CONTEXT: linux-py${{ matrix.python-version }}-compiled-no-deps-no
@@ -66,6 +66,17 @@ jobs:
         with:
           name: coverage
           path: coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          directory: ./coverage/reports/
+          fail_ci_if_error: true
+          files: ./coverage1.xml,./coverage2.xml
+          flags: unittests
+          name: codecov-umbrella
+          path_to_write_report: ./coverage/codecov_report.txt
+          verbose: true
 
   release:
     name: Semantic Release
