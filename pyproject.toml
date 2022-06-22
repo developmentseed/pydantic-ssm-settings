@@ -4,7 +4,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "pydantic-ssm-settings"
-version = "0.2.1"
+version = "0.2.2"
 description = "Replace Pydantic's builtin Secret Support with a configuration provider that loads parameters from AWS Systems Manager Parameter Store."
 authors = ["Anthony Lukach <anthonylukach@gmail.com>"]
 maintainers = ["Anthony Lukach <anthonylukach@gmail.com>"]
