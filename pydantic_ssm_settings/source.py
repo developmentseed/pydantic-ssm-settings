@@ -24,7 +24,7 @@ class SettingsError(ValueError):
 
 
 class AwsSsmSettingsSource:
-    __slots__ = ("ssm_prefix",)
+    __slots__ = ("ssm_prefix", "env_nested_delimiter")
 
     def __init__(
         self,
