@@ -69,7 +69,7 @@ class AwsSsmSettingsSource:
 
     def __call__(self, settings: BaseSettings) -> Dict[str, Any]:
         """
-        Returns lazy SSM values for all settings.
+        Returns SSM values for all settings.
         """
         d: Dict[str, Optional[Any]] = {}
 
@@ -81,7 +81,7 @@ class AwsSsmSettingsSource:
             case_sensitive=settings.__config__.case_sensitive,
         )
 
-        # The following was lifted directly from https://github.com/samuelcolvin/pydantic/blob/a21f0763ee877f0c86f254a5d60f70b1002faa68/pydantic/env_settings.py#L165-L237  # noqa
+        # The following was lifted from https://github.com/samuelcolvin/pydantic/blob/a21f0763ee877f0c86f254a5d60f70b1002faa68/pydantic/env_settings.py#L165-L237  # noqa
         for field in settings.__fields__.values():
             env_val: Optional[str] = None
             for env_name in field.field_info.extra["env_names"]:
@@ -89,11 +89,11 @@ class AwsSsmSettingsSource:
                 if env_val is not None:
                     break
 
-            is_complex, allow_json_failure = self.field_is_complex(field)
+            is_complex, allow_json_failure = self._field_is_complex(field)
             if is_complex:
                 if env_val is None:
                     # field is complex but no value found so far, try explode_env_vars
-                    env_val_built = self.explode_ssm_values(field, ssm_values)
+                    env_val_built = self._explode_ssm_values(field, ssm_values)
                     if env_val_built:
                         d[field.alias] = env_val_built
                 else:
@@ -109,7 +109,7 @@ class AwsSsmSettingsSource:
 
                     if isinstance(env_val, dict):
                         d[field.alias] = deep_update(
-                            env_val, self.explode_ssm_values(field, ssm_values)
+                            env_val, self._explode_ssm_values(field, ssm_values)
                         )
                     else:
                         d[field.alias] = env_val
@@ -120,7 +120,7 @@ class AwsSsmSettingsSource:
 
         return d
 
-    def field_is_complex(self, field: ModelField) -> Tuple[bool, bool]:
+    def _field_is_complex(self, field: ModelField) -> Tuple[bool, bool]:
         """
         Find out if a field is complex, and if so whether JSON errors should be ignored
         """
@@ -137,7 +137,7 @@ class AwsSsmSettingsSource:
 
         return True, allow_json_failure
 
-    def explode_ssm_values(
+    def _explode_ssm_values(
         self, field: ModelField, env_vars: Mapping[str, Optional[str]]
     ) -> Dict[str, Any]:
         """
