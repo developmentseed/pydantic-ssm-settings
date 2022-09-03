@@ -22,6 +22,11 @@ class AwsSsmSourceConfig:
         file_secret_settings: SecretsSettingsSource,
     ) -> Tuple[SettingsSourceCallable, ...]:
 
+        ssm_settings = AwsSsmSettingsSource(
+            ssm_prefix=file_secret_settings.secrets_dir,
+            env_nested_delimiter=env_settings.env_nested_delimiter,
+        )
+
         return (
             init_settings,
             env_settings,
@@ -30,5 +35,5 @@ class AwsSsmSourceConfig:
             # about unexpected arguments. `secrets_dir` comes from `_secrets_dir`,
             # one of the few special kwargs that Pydantic will allow:
             # https://github.com/samuelcolvin/pydantic/blob/45db4ad3aa558879824a91dd3b011d0449eb2977/pydantic/env_settings.py#L33
-            AwsSsmSettingsSource(ssm_prefix=file_secret_settings.secrets_dir),
+            ssm_settings,
         )
