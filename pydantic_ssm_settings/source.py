@@ -114,7 +114,7 @@ class AwsSsmSettingsSource:
                     else:
                         d[field.alias] = env_val
             elif env_val is not None:
-                # simplest case, field is not complex, we only need to add the 
+                # simplest case, field is not complex, we only need to add the
                 # value if it was found
                 d[field.alias] = env_val
 
@@ -141,7 +141,7 @@ class AwsSsmSettingsSource:
         self, field: ModelField, env_vars: Mapping[str, Optional[str]]
     ) -> Dict[str, Any]:
         """
-        Process env_vars and extract the values of keys containing 
+        Process env_vars and extract the values of keys containing
         env_nested_delimiter into nested dictionaries.
 
         This is applied to a single field, hence filtering by env_var prefix.
