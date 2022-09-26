@@ -28,6 +28,7 @@ moto = {extras = ["all"], version = "^2.2.19"}
 mypy = "^0.910"
 pytest = "^6.2.5"
 pytest-cov = "^2.12.1"
+python-semantic-release = "^7.32.0"
 
 [tool.semantic_release]
 # https://python-semantic-release.readthedocs.io/en/latest/configuration.html
