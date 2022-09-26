@@ -11,7 +11,7 @@ maintainers = ["Anthony Lukach <anthonylukach@gmail.com>"]
 name = "pydantic-ssm-settings"
 readme = "README.md"
 repository = "https://github.com/developmentseed/pydantic-ssm-settings/"
-version = "0.2.3"
+version = "0.2.4"
 
 [tool.poetry.dependencies]
 "boto3" = "^1.21.45"
