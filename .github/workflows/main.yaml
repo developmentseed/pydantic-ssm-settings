@@ -81,6 +81,8 @@ jobs:
           # Python Semantic Release needs access to the full history to
           # determine whether a release should be made.
           fetch-depth: 0
+          
+      - run: pip install packaging
 
       - name: Python Semantic Release
         uses: relekang/python-semantic-release@v7.28.1
