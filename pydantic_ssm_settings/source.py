@@ -48,7 +48,7 @@ class AwsSsmSettingsSource:
         if not secrets_path.is_absolute():
             raise ValueError("SSM prefix must be absolute path")
 
-        logger.debug(f"Building SSM settings with prefix of {secrets_path=}")
+        logger.debug(f"Building SSM settings with prefix of {secrets_path}")
 
         output = {}
         try:
