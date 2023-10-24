@@ -1,4 +1,4 @@
-from .settings import AwsSsmSourceConfig
+from .settings import AwsSsmSettings
 
-__all__ = ("AwsSsmSourceConfig",)
+__all__ = ("AwsSsmSettings",)
 __version__ = "0.2.4"

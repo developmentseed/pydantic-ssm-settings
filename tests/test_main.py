@@ -2,26 +2,19 @@ import logging
 
 import pytest
 
-from pydantic import BaseSettings
-from pydantic_ssm_settings import AwsSsmSourceConfig
+from pydantic_ssm_settings import AwsSsmSettings
 
 logger = logging.getLogger("pydantic_ssm_settings")
 logger.setLevel(logging.DEBUG)
 
 
-class SimpleSettings(BaseSettings):
+class SimpleSettings(AwsSsmSettings):
     foo: str
 
-    class Config(AwsSsmSourceConfig):
-        ...
 
-
-class IntSettings(BaseSettings):
+class IntSettings(AwsSsmSettings):
     foo: str
     bar: int
-
-    class Config(AwsSsmSourceConfig):
-        ...
 
 
 def test_secrets_dir_must_be_absolute():

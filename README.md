@@ -1,24 +1,22 @@
 # pydantic-ssm-settings
 
-Replace Pydantic's builtin [Secret Support](https://pydantic-docs.helpmanual.io/usage/settings/#secret-support) with a configuration provider that loads parameters from [AWS Systems Manager Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html). Parameters are loaded _lazily_, meaning that they are only requested from AWS if they are not provided via [standard field value priority](https://pydantic-docs.helpmanual.io/usage/settings/#field-value-priority) (i.e. initialiser, environment variable, or via `.env` file).
+Replace Pydantic's builtin [Secret Support](https://pydantic-docs.helpmanual.io/usage/settings/#secret-support) with a configuration provider that loads parameters from [AWS Systems Manager Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html). Parameters are loaded _lazily_, meaning that they are only requested from AWS if they are not provided via [standard field value priority](https://pydantic-docs.helpmanual.io/usage/settings/#field-value-priority) (i.e. initializer, environment variable, or via `.env` file).
 
 ## Usage
 
-The simplest way to use this module is to inhert your settings `Config` class from `AwsSsmSourceConfig`. This will overwrite the [`file_secret_settings` settings source](https://pydantic-docs.helpmanual.io/usage/settings/#customise-settings-sources) with the `AwsSsmSettingsSource`. Provide a prefix to SSM parameters via the `_secrets_dir` initialiser value or the `secrets_dir` Config value.
+The simplest way to use this module is to inhert your settings class from `AwsSsmSettings`. This will overwrite the [`pydantic` settings sources order](https://docs.pydantic.dev/latest/concepts/pydantic_settings/#customise-settings-sources) with the `AwsSsmSettingsSource`. Provide a prefix to SSM parameters via the `_secrets_dir` initializer value or the `secrets_dir` Config value.
 
 ```py
 from pydantic import BaseSettings
-from pydantic_ssm_settings import AwsSsmSourceConfig
+from pydantic_ssm_settings import AwsSsmSettings
 
 
-class WebserviceSettings(BaseSettings):
+class WebserviceSettings(AwsSsmSettings):
     some_val: str
     another_val: int
 
-    class Config(AwsSsmSourceConfig):
-        ...
 
 SimpleSettings(_secrets_dir='/prod/webservice')
 ```
 
-The above example will attempt to retreive values from `/prod/webservice/some_val` and `/prod/webservice/another_val` if not provided otherwise.
+The above example will attempt to retrieve values from `/prod/webservice/some_val` and `/prod/webservice/another_val` if not provided otherwise.

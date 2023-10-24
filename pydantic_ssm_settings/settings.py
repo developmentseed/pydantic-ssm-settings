@@ -1,30 +1,28 @@
 import logging
-from typing import Tuple
+from typing import Tuple, Type
 
-from pydantic.env_settings import (
-    EnvSettingsSource,
-    InitSettingsSource,
-    SecretsSettingsSource,
-    SettingsSourceCallable,
-)
-
-from .source import AwsSsmSettingsSource
+from pydantic_settings import BaseSettings, PydanticBaseSettingsSource
+from pydantic_ssm_settings.source import AwsSsmSettingsSource
 
 logger = logging.getLogger(__name__)
 
 
-class AwsSsmSourceConfig:
+class AwsSsmSettings(BaseSettings):
+
     @classmethod
-    def customise_sources(
+    def settings_customise_sources(
         cls,
-        init_settings: InitSettingsSource,
-        env_settings: EnvSettingsSource,
-        file_secret_settings: SecretsSettingsSource,
-    ) -> Tuple[SettingsSourceCallable, ...]:
+        settings_cls: Type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> Tuple[PydanticBaseSettingsSource, ...]:
 
         ssm_settings = AwsSsmSettingsSource(
-            ssm_prefix=file_secret_settings.secrets_dir,
-            env_nested_delimiter=env_settings.env_nested_delimiter,
+            settings_cls=settings_cls,
+            ssm_prefix=settings_cls.model_config.get("secrets_dir"),
+            env_nested_delimiter=settings_cls.model_config.get("env_nested_delimiter"),
         )
 
         return (

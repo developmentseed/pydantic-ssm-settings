@@ -14,9 +14,10 @@ repository = "https://github.com/developmentseed/pydantic-ssm-settings/"
 version = "0.2.4"
 
 [tool.poetry.dependencies]
-"boto3" = "^1.21.45"
-pydantic = "^1.6.2"
-python = "^3.7"
+boto3 = "^1.21.45"
+pydantic = "^2.4.2"
+pydantic-settings = "^2.0"
+python = "^3.8"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"
@@ -32,12 +33,12 @@ python-semantic-release = "^7.32.0"
 
 [tool.semantic_release]
 # https://python-semantic-release.readthedocs.io/en/latest/configuration.html
-branch = "main" 
+branch = "main"
 build_command = "pip install poetry && poetry build" # https://github.com/relekang/python-semantic-release/issues/222#issuecomment-709326972
-upload_to_pypi = true 
-upload_to_release = true 
-version_toml = "pyproject.toml:tool.poetry.version" 
-version_variable = "pydantic_ssm_settings/__init__.py:__version__" 
+upload_to_pypi = true
+upload_to_release = true
+version_toml = "pyproject.toml:tool.poetry.version"
+version_variable = "pydantic_ssm_settings/__init__.py:__version__"
 
 [tool.flake8]
 ignore = ["E203", "W503"]
