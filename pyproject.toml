@@ -25,7 +25,7 @@ build_command = "pip install uv && uv build" # https://github.com/python-semanti
 upload_to_pypi = true 
 upload_to_release = true 
 version_toml = ["pyproject.toml:project.version"] 
-version_variable = "pydantic_ssm_settings/__init__.py:__version__" 
+version_variables = ["pydantic_ssm_settings/__init__.py:__version__"] 
 
 [tool.flake8]
 ignore = ["E203", "W503"]
