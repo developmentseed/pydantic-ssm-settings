@@ -1049,7 +1049,7 @@ wheels = [
 
 [[package]]
 name = "pydantic-ssm-settings"
-version = "0.2.4"
+version = "1.0.0"
 source = { virtual = "." }
 dependencies = [
     { name = "pydantic-settings" },
