@@ -1,3 +1,5 @@
+import boto3
+import moto
 import pytest
 from pydantic import BaseModel
 from pydantic_settings import SettingsConfigDict
@@ -116,3 +118,13 @@ def test_parameters_from_model_config(ssm):
     ssm.put_parameter(Name="/asdf/foo", Value="bar", Type="String")
     settings = CustomConfigDict()
     assert settings.foo == "bar"
+
+
+@pytest.mark.parametrize("region", ["us-east-1", "us-west-2"])
+def test_custom_client(region: str):
+    with moto.mock_aws():
+        client = boto3.client("ssm", region_name=region)
+        client.put_parameter(Name="/foo", Value=region, Type="String")
+
+        settings = SimpleSettings(_ssm_client=client)
+        assert settings.foo == region

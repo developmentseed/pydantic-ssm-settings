@@ -31,31 +31,31 @@ class AwsSsmSettingsSource(EnvSettingsSource):
         settings_cls: type[BaseSettings],
         case_sensitive: Optional[bool] = None,
         ssm_prefix: Optional[str] = None,
+        ssm_client: Optional["SSMClient"] = None,
     ):
-        # Ideally would retrieve ssm_prefix from self.config
-        # but need the superclass to be initialized for that
-        ssm_prefix_ = (
+        ssm_prefix = (
             ssm_prefix
             if ssm_prefix is not None
             else settings_cls.model_config.get("ssm_prefix", "/")
         )
+        self.ssm_client = (
+            ssm_client
+            if ssm_client
+            else settings_cls.model_config.get("ssm_client", self._build_client())
+        )
         super().__init__(
             settings_cls,
             case_sensitive=case_sensitive,
-            env_prefix=ssm_prefix_,
+            env_prefix=ssm_prefix,
             env_nested_delimiter="/",  # SSM only accepts / as a delimiter
         )
-        self.ssm_prefix = ssm_prefix_
-        assert self.ssm_prefix == self.env_prefix
+        assert ssm_prefix == self.env_prefix
 
-    @property
-    def client(self) -> "SSMClient":
-        return boto3.client("ssm", config=self.client_config)
-
-    @property
-    def client_config(self) -> Config:
+    def _build_client(self) -> "SSMClient":
         timeout = float(os.environ.get("SSM_TIMEOUT", 0.5))
-        return Config(connect_timeout=timeout, read_timeout=timeout)
+        return boto3.client(
+            "ssm", config=Config(connect_timeout=timeout, read_timeout=timeout)
+        )
 
     def _load_env_vars(
         self,
@@ -68,7 +68,7 @@ class AwsSsmSettingsSource(EnvSettingsSource):
 
         output = {}
         try:
-            paginator = self.client.get_paginator("get_parameters_by_path")
+            paginator = self.ssm_client.get_paginator("get_parameters_by_path")
             response_iterator = paginator.paginate(
                 Path=self.env_prefix, WithDecryption=True, Recursive=True
             )
