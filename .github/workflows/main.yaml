@@ -62,7 +62,7 @@ jobs:
           CONTEXT: linux-py${{ matrix.python-version }}-compiled-no-deps-no
 
       - name: store coverage files
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: coverage
           path: coverage
