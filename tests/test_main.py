@@ -1,13 +1,8 @@
-import logging
-
 import pytest
 from pydantic import BaseModel
 from pydantic_settings import SettingsConfigDict
 
 from pydantic_ssm_settings import AwsSsmSourceConfig, SsmSettingsConfigDict
-
-logger = logging.getLogger("pydantic_ssm_settings")
-logger.setLevel(logging.DEBUG)
 
 
 class SimpleSettings(AwsSsmSourceConfig):
