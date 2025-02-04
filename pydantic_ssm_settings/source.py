@@ -3,14 +3,11 @@ from __future__ import annotations as _annotations
 import logging
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional
 
 import boto3
 from botocore.client import Config
 from botocore.exceptions import ClientError
-from pydantic import BaseModel
-from pydantic._internal._utils import lenient_issubclass
-from pydantic.fields import FieldInfo
 from pydantic_settings import BaseSettings
 from pydantic_settings.sources import EnvSettingsSource
 
@@ -93,67 +90,3 @@ class AwsSsmSettingsSource(EnvSettingsSource):
 
     def __repr__(self) -> str:
         return f"AwsSsmSettingsSource(ssm_prefix={self.env_prefix!r})"
-
-    def get_field_value(
-        self, field: FieldInfo, field_name: str
-    ) -> tuple[Any, str, bool]:
-        """
-        Gets the value for field from environment variables and a flag to
-        determine whether value is complex.
-
-        Args:
-            field: The field.
-            field_name: The field name.
-
-        Returns:
-            A tuple contains the key, value if the file exists otherwise `None`, and
-                a flag to determine whether value is complex.
-        """
-
-        # env_name = /asdf/foo
-        # env_vars = {foo:xyz}
-        env_val: str | None = None
-        for field_key, env_name, value_is_complex in self._extract_field_info(
-            field, field_name
-        ):
-            env_val = self.env_vars.get(env_name)
-            if env_val is not None:
-                break
-
-        return env_val, field_key, value_is_complex
-
-    def __call__(self) -> dict[str, Any]:
-        data: dict[str, Any] = {}
-
-        for field_name, field in self.settings_cls.model_fields.items():
-            try:
-                field_value, field_key, value_is_complex = self.get_field_value(
-                    field, field_name
-                )
-            except Exception as e:
-                raise SettingsError(
-                    f'error getting value for field "{field_name}" from source "{self.__class__.__name__}"'  # noqa
-                ) from e
-
-            try:
-                field_value = self.prepare_field_value(
-                    field_name, field, field_value, value_is_complex
-                )
-            except ValueError as e:
-                raise SettingsError(
-                    f'error parsing value for field "{field_name}" from source "{self.__class__.__name__}"'  # noqa
-                ) from e
-
-            if field_value is not None:
-                if (
-                    not self.case_sensitive
-                    and lenient_issubclass(field.annotation, BaseModel)
-                    and isinstance(field_value, dict)
-                ):
-                    data[field_key] = self._replace_field_names_case_insensitively(
-                        field, field_value
-                    )
-                else:
-                    data[field_key] = field_value
-
-        return data
