@@ -3,7 +3,7 @@ from __future__ import annotations as _annotations
 import logging
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional
 
 import boto3
 from botocore.client import Config
@@ -12,9 +12,7 @@ from pydantic import BaseModel
 from pydantic._internal._utils import lenient_issubclass
 from pydantic.fields import FieldInfo
 from pydantic_settings import BaseSettings
-from pydantic_settings.sources import (
-    EnvSettingsSource,
-)
+from pydantic_settings.sources import EnvSettingsSource
 
 if TYPE_CHECKING:
     from mypy_boto3_ssm.client import SSMClient
@@ -31,8 +29,8 @@ class AwsSsmSettingsSource(EnvSettingsSource):
     def __init__(
         self,
         settings_cls: type[BaseSettings],
-        case_sensitive: bool = None,
-        ssm_prefix: str = None,
+        case_sensitive: Optional[bool] = None,
+        ssm_prefix: Optional[str] = None,
     ):
         # Ideally would retrieve ssm_prefix from self.config
         # but need the superclass to be initialized for that
@@ -62,9 +60,7 @@ class AwsSsmSettingsSource(EnvSettingsSource):
     def _load_env_vars(
         self,
     ):
-        """
-        Access env_prefix instead of ssm_prefix
-        """
+        # NOTE: env_prefix represents the ssm_prefix
         if not Path(self.env_prefix).is_absolute():
             raise ValueError("SSM prefix must be absolute path")
 
@@ -83,9 +79,11 @@ class AwsSsmSettingsSource(EnvSettingsSource):
                         Path(parameter["Name"]).relative_to(self.env_prefix).as_posix()
                     )
                     output[
-                        self.env_prefix + key
-                        if self.case_sensitive
-                        else self.env_prefix.lower() + key.lower()
+                        (
+                            self.env_prefix + key
+                            if self.case_sensitive
+                            else self.env_prefix.lower() + key.lower()
+                        )
                     ] = parameter["Value"]
 
         except ClientError:
@@ -143,7 +141,7 @@ class AwsSsmSettingsSource(EnvSettingsSource):
                 )
             except ValueError as e:
                 raise SettingsError(
-                    f'error parsing value for field "{field_name}" from source "{self.__class__.__name__}"' # noqa
+                    f'error parsing value for field "{field_name}" from source "{self.__class__.__name__}"'  # noqa
                 ) from e
 
             if field_value is not None:

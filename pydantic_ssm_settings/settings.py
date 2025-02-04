@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Tuple, Type
+from typing import Any, Optional, Tuple, Type
 
 from pydantic_settings import (
     BaseSettings,
@@ -26,7 +26,7 @@ class BaseSettingsSsmWrapper(BaseSettings):
     __pydantic_private__ exception
     """
 
-    def __init__(self, *args, _ssm_prefix: str = None, **kwargs: Any) -> None:
+    def __init__(self, *args, _ssm_prefix: Optional[str] = None, **kwargs: Any) -> None:
         """
         Args:
             _ssm_prefix: Prefix for all ssm parameters. Must be an absolute path,
