@@ -24,7 +24,7 @@ class ParentSetting(SsmBaseSettings):
     foo: ChildSetting
 
 
-def test_ssm_prefix_must_be_absolute():
+def test_ssm_prefix_must_be_absolute(ssm):
     with pytest.raises(ValueError):
         SimpleSettings(_ssm_prefix="asdf")
 
