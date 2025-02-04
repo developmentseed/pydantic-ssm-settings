@@ -9,28 +9,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install poetry
-        run: pipx install poetry
-
       - uses: actions/setup-python@v4
         with:
-          python-version: 3.9
-          cache: "poetry"
+          python-version: 3.12
 
-      - run: poetry install
-
-      - name: run linters
-        uses: wearerequired/lint-action@v1
+      - uses: astral-sh/setup-uv@v5
         with:
-          black: true
-          black_args: pydantic_ssm_settings
-          black_command_prefix: poetry run
-          flake8: true
-          flake8_args: pydantic_ssm_settings
-          flake8_command_prefix: poetry run
-          mypy: true
-          mypy_args: pydantic_ssm_settings
-          mypy_command_prefix: poetry run
+          enable-cache: true
+
+      - run: uv sync
 
   test:
     runs-on: ubuntu-latest
@@ -46,17 +33,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install poetry
-        run: pipx install poetry
-
-      - uses: actions/setup-python@v4
+      - uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "poetry"
+          enable-cache: true
 
-      - run: poetry install
+      - run: uv sync
 
-      - run: poetry run pytest --cov=pydantic_ssm_settings
+      - run: uv run pytest --cov=pydantic_ssm_settings
         env:
           COVERAGE_FILE: coverage/.coverage.linux-py${{ matrix.python-version }}-cN-dN
           CONTEXT: linux-py${{ matrix.python-version }}-compiled-no-deps-no
@@ -81,7 +65,7 @@ jobs:
           # Python Semantic Release needs access to the full history to
           # determine whether a release should be made.
           fetch-depth: 0
-          
+
       - run: pip install packaging
 
       - name: Python Semantic Release
