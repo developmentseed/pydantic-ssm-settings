@@ -1,15 +1,10 @@
 import logging
 
 import pytest
-from pydantic import (
-    BaseModel,
-)
+from pydantic import BaseModel
 from pydantic_settings import SettingsConfigDict
 
-from pydantic_ssm_settings import (
-    AwsSsmSourceConfig,
-    SsmSettingsConfigDict,
-)
+from pydantic_ssm_settings import AwsSsmSourceConfig, SsmSettingsConfigDict
 
 logger = logging.getLogger("pydantic_ssm_settings")
 logger.setLevel(logging.DEBUG)
@@ -38,33 +33,33 @@ def test_ssm_prefix_must_be_absolute():
 
 
 def test_lookup_from_ssm(ssm):
-    ssm.put_parameter(Name="/foo", Value="bar")
+    ssm.put_parameter(Name="/foo", Value="bar", Type="String")
     settings = SimpleSettings()
     assert settings.foo == "bar"
 
 
 def test_lookup_from_ssm_with_prefix(ssm):
-    ssm.put_parameter(Name="/asdf/foo", Value="bar")
+    ssm.put_parameter(Name="/asdf/foo", Value="bar", Type="String")
     settings = SimpleSettings(_ssm_prefix="/asdf")
     assert settings.foo == "bar"
 
 
 def test_casting(ssm):
-    ssm.put_parameter(Name="/foo", Value="xyz123")
-    ssm.put_parameter(Name="/bar", Value="99")
+    ssm.put_parameter(Name="/foo", Value="xyz123", Type="String")
+    ssm.put_parameter(Name="/bar", Value="99", Type="String")
     settings = IntSettings()
     assert isinstance(settings.bar, int)
     assert settings.bar == 99
 
 
 def test_parameter_override(ssm):
-    ssm.put_parameter(Name="/foo", Value="ssm_bar")
+    ssm.put_parameter(Name="/foo", Value="ssm_bar", Type="String")
     s = SimpleSettings(foo="param_bar")
     assert s.foo == "param_bar"
 
 
 def test_dotenv_override(tmp_path, ssm):
-    ssm.put_parameter(Name="/foo", Value="ssm_bar")
+    ssm.put_parameter(Name="/foo", Value="ssm_bar", Type="String")
     p = tmp_path / ".env"
     p.write_text("foo=dotenv_bar")
 
@@ -73,7 +68,7 @@ def test_dotenv_override(tmp_path, ssm):
 
 
 def test_env_override(env, ssm):
-    ssm.put_parameter(Name="/foo", Value="ssm_bar")
+    ssm.put_parameter(Name="/foo", Value="ssm_bar", Type="String")
     env.set("foo", "env_bar")
     s = SimpleSettings()
     assert s.foo == "env_bar"
@@ -82,26 +77,26 @@ def test_env_override(env, ssm):
 def test_secret_override(tmp_path, ssm):
     p = tmp_path / "foo"
     p.write_text("secret_bar")
-    ssm.put_parameter(Name="/foo", Value="ssm_bar")
+    ssm.put_parameter(Name="/foo", Value="ssm_bar", Type="String")
     s = SimpleSettings(_secrets_dir=tmp_path)
     assert s.foo == "secret_bar"
 
 
 def test_nested_parameters(ssm):
-    ssm.put_parameter(Name="/foo/bar", Value="bar_value")
+    ssm.put_parameter(Name="/foo/bar", Value="bar_value", Type="String")
     settings = ParentSetting()
     assert settings.foo.bar == "bar_value"
 
 
 def test_ssm_parameter_json(ssm):
-    ssm.put_parameter(Name="/foo", Value='{"bar": "xyz123"}')
+    ssm.put_parameter(Name="/foo", Value='{"bar": "xyz123"}', Type="String")
     settings = ParentSetting()
     assert settings.foo.bar == "xyz123"
 
 
 def test_ssm_parameter_json_override(ssm):
-    ssm.put_parameter(Name="/foo", Value='{"bar": "xyz123"}')
-    ssm.put_parameter(Name="/foo/bar", Value="overwritten")
+    ssm.put_parameter(Name="/foo", Value='{"bar": "xyz123"}', Type="String")
+    ssm.put_parameter(Name="/foo/bar", Value="overwritten", Type="String")
     settings = ParentSetting()
     assert settings.foo.bar == "overwritten"
 
@@ -112,7 +107,7 @@ class CaseInsensitiveSettings(AwsSsmSourceConfig):
 
 
 def test_case_insensitivity(ssm):
-    ssm.put_parameter(Name="/FOO", Value="bar")
+    ssm.put_parameter(Name="/FOO", Value="bar", Type="String")
     settings = CaseInsensitiveSettings()
     assert settings.foo == "bar"
 
@@ -123,6 +118,6 @@ class CustomConfigDict(AwsSsmSourceConfig):
 
 
 def test_parameters_from_model_config(ssm):
-    ssm.put_parameter(Name="/asdf/foo", Value="bar")
+    ssm.put_parameter(Name="/asdf/foo", Value="bar", Type="String")
     settings = CustomConfigDict()
     assert settings.foo == "bar"
