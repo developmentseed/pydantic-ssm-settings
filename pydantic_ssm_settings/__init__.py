@@ -1,4 +1,4 @@
-from .settings import AwsSsmSourceConfig, SsmSettingsConfigDict
+from .settings import AwsSsmBaseSettings, SsmSettingsConfigDict
 from .source import AwsSsmSettingsSource
 
 __all__ = ("AwsSsmSourceConfig", "SsmSettingsConfigDict", "AwsSsmSettingsSource")

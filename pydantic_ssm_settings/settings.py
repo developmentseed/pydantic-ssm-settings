@@ -19,14 +19,18 @@ class SsmSettingsConfigDict(SettingsConfigDict):
     ssm_prefix: str
 
 
-class BaseSettingsSsmWrapper(BaseSettings):
+class AwsSsmBaseSettings(BaseSettings):
     """
-    Wrapper to store the _ssm_prefix parameter as an instance attribute.
-    Need a direct access to the attributes dictionary to avoid raising an AttributeError:
-    __pydantic_private__ exception
+    Helper to configure the AWS SSM source for Pydantic settings and to pass
+    options from init args to settings.
     """
 
-    def __init__(self, *args, _ssm_prefix: Optional[str] = None, **kwargs: Any) -> None:
+    def __init__(
+        self,
+        *args,
+        _ssm_prefix: Optional[str] = None,
+        **kwargs: Any,
+    ) -> None:
         """
         Args:
             _ssm_prefix: Prefix for all ssm parameters. Must be an absolute path,
@@ -34,11 +38,10 @@ class BaseSettingsSsmWrapper(BaseSettings):
             is treated case sensitively regardless of the _case_sensitive
             parameter value.
         """
+        # NOTE: Need a direct access to the attributes dictionary to avoid raising an AttributeError: __pydantic_private__ exception
         self.__dict__["__ssm_prefix"] = _ssm_prefix
         super().__init__(self, *args, **kwargs)
 
-
-class AwsSsmSourceConfig(BaseSettingsSsmWrapper):
     def settings_customise_sources(
         self,
         settings_cls: Type[BaseSettings],

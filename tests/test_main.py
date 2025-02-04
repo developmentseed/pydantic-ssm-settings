@@ -2,14 +2,14 @@ import pytest
 from pydantic import BaseModel
 from pydantic_settings import SettingsConfigDict
 
-from pydantic_ssm_settings import AwsSsmSourceConfig, SsmSettingsConfigDict
+from pydantic_ssm_settings import AwsSsmBaseSettings, SsmSettingsConfigDict
 
 
-class SimpleSettings(AwsSsmSourceConfig):
+class SimpleSettings(AwsSsmBaseSettings):
     foo: str
 
 
-class IntSettings(AwsSsmSourceConfig):
+class IntSettings(AwsSsmBaseSettings):
     foo: str
     bar: int
 
@@ -18,7 +18,7 @@ class ChildSetting(BaseModel):
     bar: str
 
 
-class ParentSetting(AwsSsmSourceConfig):
+class ParentSetting(AwsSsmBaseSettings):
     foo: ChildSetting
 
 
@@ -96,7 +96,7 @@ def test_ssm_parameter_json_override(ssm):
     assert settings.foo.bar == "overwritten"
 
 
-class CaseInsensitiveSettings(AwsSsmSourceConfig):
+class CaseInsensitiveSettings(AwsSsmBaseSettings):
     model_config = SettingsConfigDict(case_sensitive=False)
     foo: str
 
@@ -107,7 +107,7 @@ def test_case_insensitivity(ssm):
     assert settings.foo == "bar"
 
 
-class CustomConfigDict(AwsSsmSourceConfig):
+class CustomConfigDict(AwsSsmBaseSettings):
     model_config = SsmSettingsConfigDict(ssm_prefix="/asdf")
     foo: str
 
