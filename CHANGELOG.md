@@ -1,6 +1,39 @@
 # CHANGELOG
 
 
+## v1.1.0 (2025-02-04)
+
+### Bug Fixes
+
+- **test**: Ensure client is mocked
+  ([`1c89c0c`](https://github.com/developmentseed/pydantic-ssm-settings/commit/1c89c0c1b1c5f91d57765d6c9930e525acdb68ca))
+
+### Chores
+
+- Rename AwsSsmSourceConfig to AwsSsmBaseSettings
+  ([`8ea89bb`](https://github.com/developmentseed/pydantic-ssm-settings/commit/8ea89bb6029bf3e09aa3f759682bcece9dd0f8bf))
+
+- Rename classes for brevity
+  ([`333ebf6`](https://github.com/developmentseed/pydantic-ssm-settings/commit/333ebf6ea1abd3039bcce9b40995780564a7b30c))
+
+- Rm unused subclassed methods
+  ([`af76030`](https://github.com/developmentseed/pydantic-ssm-settings/commit/af76030ad1fd418423d626021cbe8d2771b84a44))
+
+- Up pkg version in lock
+  ([`4186d7e`](https://github.com/developmentseed/pydantic-ssm-settings/commit/4186d7e65d47b33f5af3d6f8c91873c3ad79fef5))
+
+- **docs**: Improve readme
+  ([`46c5357`](https://github.com/developmentseed/pydantic-ssm-settings/commit/46c53579be48185c0ecee64bdd3dd6f016ef74d1))
+
+- **test**: Rm unused variables
+  ([`9b495c6`](https://github.com/developmentseed/pydantic-ssm-settings/commit/9b495c62d17e0d8bec9536f6714e6dd69ec86b22))
+
+### Features
+
+- Support custom boto3 client
+  ([`1def3c3`](https://github.com/developmentseed/pydantic-ssm-settings/commit/1def3c32bcde4b12c5951fc2db467ef0cedd9eb0))
+
+
 ## v1.0.0 (2025-02-04)
 
 ### Bug Fixes
