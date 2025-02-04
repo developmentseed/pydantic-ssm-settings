@@ -5,7 +5,7 @@ dependencies = [
 description = "AWS SSM support for Pydantic Settings"
 name = "pydantic-ssm-settings"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 version = "0.2.4"
 
 [dependency-groups]
