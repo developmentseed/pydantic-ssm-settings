@@ -70,8 +70,6 @@ jobs:
       - run: pip install packaging
 
       - name: Python Semantic Release
-        uses: relekang/python-semantic-release@v7.28.1
+        uses: python-semantic-release/python-semantic-release@v9.17.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          repository_username: __token__
-          repository_password: ${{ secrets.PYPI_API_TOKEN }}
