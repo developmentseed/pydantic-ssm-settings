@@ -10,7 +10,7 @@ from pydantic_settings import (
     SettingsConfigDict,
 )
 
-from .source import AwsSsmSettingsSource
+from .source import SsmSettingsSource
 
 if TYPE_CHECKING:
     from mypy_boto3_ssm.client import SSMClient
@@ -23,7 +23,7 @@ class SsmSettingsConfigDict(SettingsConfigDict):
     ssm_client: Optional["SSMClient"]
 
 
-class AwsSsmBaseSettings(BaseSettings):
+class SsmBaseSettings(BaseSettings):
     """
     Helper to configure the AWS SSM source for Pydantic settings and to pass
     options from init args to settings.
@@ -58,7 +58,7 @@ class AwsSsmBaseSettings(BaseSettings):
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: SecretsSettingsSource,
     ) -> Tuple[PydanticBaseSettingsSource, ...]:
-        ssm_settings = AwsSsmSettingsSource(
+        ssm_settings = SsmSettingsSource(
             settings_cls=settings_cls,
             ssm_prefix=self.__dict__["__ssm_prefix"],
             ssm_client=self.__dict__["__ssm_client"],

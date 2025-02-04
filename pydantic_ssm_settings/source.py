@@ -22,7 +22,7 @@ class SettingsError(ValueError):
     pass
 
 
-class AwsSsmSettingsSource(EnvSettingsSource):
+class SsmSettingsSource(EnvSettingsSource):
     def __init__(
         self,
         settings_cls: type[BaseSettings],

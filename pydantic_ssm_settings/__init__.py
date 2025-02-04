@@ -1,5 +1,5 @@
-from .settings import AwsSsmBaseSettings, SsmSettingsConfigDict
-from .source import AwsSsmSettingsSource
+from .settings import SsmBaseSettings, SsmSettingsConfigDict
+from .source import SsmSettingsSource
 
-__all__ = ("AwsSsmSourceConfig", "SsmSettingsConfigDict", "AwsSsmSettingsSource")
+__all__ = ("SsmBaseSettings", "SsmSettingsConfigDict", "SsmSettingsSource")
 __version__ = "1.0.0"
