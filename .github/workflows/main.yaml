@@ -19,6 +19,8 @@ jobs:
 
       - run: uv sync
 
+      - run: uv run pre-commit run --all-files
+
   test:
     runs-on: ubuntu-latest
     strategy:
