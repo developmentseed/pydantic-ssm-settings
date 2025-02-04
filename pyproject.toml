@@ -1,42 +1,29 @@
-[build-system]
-build-backend = "poetry.masonry.api"
-requires = ["poetry>=0.12"]
-
-[tool.poetry]
-authors = ["Anthony Lukach <anthonylukach@gmail.com>"]
-description = "Replace Pydantic's builtin Secret Support with a configuration provider that loads parameters from AWS Systems Manager Parameter Store."
-homepage = ""
-license = "MIT"
-maintainers = ["Anthony Lukach <anthonylukach@gmail.com>"]
+[project]
+dependencies = [
+  "pydantic-settings>=2",
+]
+description = "AWS SSM support for Pydantic Settings"
 name = "pydantic-ssm-settings"
 readme = "README.md"
-repository = "https://github.com/developmentseed/pydantic-ssm-settings/"
+requires-python = ">=3.13"
 version = "0.2.4"
 
-[tool.poetry.dependencies]
-"boto3" = "^1.21.45"
-pydantic = "^1.6.2"
-python = "^3.7"
-
-[tool.poetry.dev-dependencies]
-black = "^22.3.0"
-boto3-stubs = {extras = ["ssm"], version = "^1.21.45"}
-coverage = {extras = ["toml"], version = "^6.4.1"}
-flake9 = "^3.8.3"
-isort = "^5.9.3"
-moto = {extras = ["all"], version = "^2.2.19"}
-mypy = "^0.910"
-pytest = "^6.2.5"
-pytest-cov = "^2.12.1"
-python-semantic-release = "^7.32.0"
+[dependency-groups]
+dev = [
+  "boto3>=1.36.12",
+  "boto3-stubs[ssm]>=1.36.12",
+  "pre-commit>=4.1.0",
+  "pytest>=8.3.4",
+  "moto[all]>=5.0.28",
+]
 
 [tool.semantic_release]
 # https://python-semantic-release.readthedocs.io/en/latest/configuration.html
 branch = "main" 
-build_command = "pip install poetry && poetry build" # https://github.com/relekang/python-semantic-release/issues/222#issuecomment-709326972
+build_command = "pip install uv && uv build" # https://github.com/python-semantic-release/python-semantic-release/issues/222#issuecomment-2599855898
 upload_to_pypi = true 
 upload_to_release = true 
-version_toml = "pyproject.toml:tool.poetry.version" 
+version_toml = "pyproject.toml:project.version" 
 version_variable = "pydantic_ssm_settings/__init__.py:__version__" 
 
 [tool.flake8]
@@ -58,8 +45,7 @@ multi_line_output = 3
 
 [tool.mypy]
 files = "pydantic_ssm_settings"
-python_version = 3.9
-show_error_codes = "True"
+python_version = "3.9"
 
 [tool.coverage]
 precision = 2

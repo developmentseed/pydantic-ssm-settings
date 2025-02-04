@@ -1,8 +1,8 @@
 import os
 
 import boto3
+import moto
 import pytest
-from moto import mock_ssm
 
 
 @pytest.fixture(scope="function")
@@ -17,5 +17,5 @@ def aws_credentials():
 
 @pytest.fixture(scope="function")
 def ssm(aws_credentials):
-    with mock_ssm():
+    with moto.mock_aws():
         yield boto3.client("ssm")

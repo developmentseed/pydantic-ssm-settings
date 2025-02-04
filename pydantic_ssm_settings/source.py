@@ -1,166 +1,78 @@
-import os
-import logging
+import warnings
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Mapping, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Dict, Mapping, Optional
 
-from botocore.exceptions import ClientError
-from botocore.client import Config
-import boto3
-
-from pydantic import BaseSettings
-from pydantic.typing import StrPath, get_origin, is_union
-from pydantic.utils import deep_update
-from pydantic.fields import ModelField
+from pydantic_settings.sources import EnvSettingsSource
 
 if TYPE_CHECKING:
-    from mypy_boto3_ssm.client import SSMClient
+    try:
+        from mypy_boto3_ssm import SSMClient
+    except ImportError:
+        ...
 
 
-logger = logging.getLogger(__name__)
+class AwsSsmSettingsSource(EnvSettingsSource):
+    DEFAULT_SSM_Path = "/"
 
+    def __call__(self) -> Dict[str, Any]:
+        return super().__call__()
 
-class SettingsError(ValueError):
-    pass
-
-
-class AwsSsmSettingsSource:
-    __slots__ = ("ssm_prefix", "env_nested_delimiter")
-
-    def __init__(
-        self,
-        ssm_prefix: Optional[StrPath],
-        env_nested_delimiter: Optional[str] = None,
-    ):
-        self.ssm_prefix: Optional[StrPath] = ssm_prefix
-        self.env_nested_delimiter: Optional[str] = env_nested_delimiter
+    def _get_source_arg(self, name: str) -> Any:
+        """
+        Helper to retrieve source arguments from the settings class or the current state.
+        """
+        return next(
+            (
+                val
+                for val in [
+                    self.settings_cls.model_config.get(name),
+                    self.current_state.get(f"_{name}"),
+                ]
+                if val
+            ),
+            None,
+        )
 
     @property
-    def client(self) -> "SSMClient":
-        return boto3.client("ssm", config=self.client_config)
+    def _ssm_client(self) -> "SSMClient":
+        client = self._get_source_arg("ssm_client")
+        if client is None:
+            raise ValueError(
+                f"Required configuration 'ssm_client' not set on {self.__class__.__name__}"
+            )
+        return client
 
     @property
-    def client_config(self) -> Config:
-        timeout = float(os.environ.get("SSM_TIMEOUT", 0.5))
-        return Config(connect_timeout=timeout, read_timeout=timeout)
+    def _ssm_path(self) -> str:
+        return self._get_source_arg("ssm_path") or self.DEFAULT_SSM_Path
 
-    def load_from_ssm(self, secrets_path: Path, case_sensitive: bool):
+    # def get_field_value(
+    #     self, field: FieldInfo, field_name: str
+    # ) -> Tuple[Any, str, bool]: ...
 
-        if not secrets_path.is_absolute():
-            raise ValueError("SSM prefix must be absolute path")
-
-        logger.debug(f"Building SSM settings with prefix of {secrets_path=}")
+    def _load_env_vars(self) -> Mapping[str, Optional[str]]:
+        paginator = self._ssm_client.get_paginator("get_parameters_by_path")
+        response_iterator = paginator.paginate(
+            Path=self._ssm_path, WithDecryption=True, Recursive=True
+        )
 
         output = {}
         try:
-            paginator = self.client.get_paginator("get_parameters_by_path")
-            response_iterator = paginator.paginate(
-                Path=str(secrets_path), WithDecryption=True
-            )
-
             for page in response_iterator:
                 for parameter in page["Parameters"]:
-                    key = Path(parameter["Name"]).relative_to(secrets_path).as_posix()
-                    output[key if case_sensitive else key.lower()] = parameter["Value"]
+                    name = Path(parameter["Name"])
+                    key = name.relative_to(self._ssm_path).as_posix()
 
-        except ClientError:
-            logger.exception("Failed to get parameters from %s", secrets_path)
+                    if not self.case_sensitive:
+                        first_key, *rest = key.split(self.env_nested_delimiter)
+                        key = self.env_nested_delimiter.join([first_key.lower(), *rest])
+
+                    output[key] = parameter["Value"]
+
+        except self._ssm_client.exceptions.ClientError as e:
+            warnings.warn(f"Unable to get parameters from {self._ssm_path!r}: {e}")
 
         return output
 
-    def __call__(self, settings: BaseSettings) -> Dict[str, Any]:
-        """
-        Returns SSM values for all settings.
-        """
-        d: Dict[str, Optional[Any]] = {}
-
-        if self.ssm_prefix is None:
-            return d
-
-        ssm_values = self.load_from_ssm(
-            secrets_path=Path(self.ssm_prefix),
-            case_sensitive=settings.__config__.case_sensitive,
-        )
-
-        # The following was lifted from https://github.com/samuelcolvin/pydantic/blob/a21f0763ee877f0c86f254a5d60f70b1002faa68/pydantic/env_settings.py#L165-L237  # noqa
-        for field in settings.__fields__.values():
-            env_val: Optional[str] = None
-            for env_name in field.field_info.extra["env_names"]:
-                env_val = ssm_values.get(env_name)
-                if env_val is not None:
-                    break
-
-            is_complex, allow_json_failure = self._field_is_complex(field)
-            if is_complex:
-                if env_val is None:
-                    # field is complex but no value found so far, try explode_env_vars
-                    env_val_built = self._explode_ssm_values(field, ssm_values)
-                    if env_val_built:
-                        d[field.alias] = env_val_built
-                else:
-                    # field is complex and there's a value, decode that as JSON, then
-                    # add explode_env_vars
-                    try:
-                        env_val = settings.__config__.json_loads(env_val)
-                    except ValueError as e:
-                        if not allow_json_failure:
-                            raise SettingsError(
-                                f'error parsing JSON for "{env_name}"'
-                            ) from e
-
-                    if isinstance(env_val, dict):
-                        d[field.alias] = deep_update(
-                            env_val, self._explode_ssm_values(field, ssm_values)
-                        )
-                    else:
-                        d[field.alias] = env_val
-            elif env_val is not None:
-                # simplest case, field is not complex, we only need to add the
-                # value if it was found
-                d[field.alias] = env_val
-
-        return d
-
-    def _field_is_complex(self, field: ModelField) -> Tuple[bool, bool]:
-        """
-        Find out if a field is complex, and if so whether JSON errors should be ignored
-        """
-        if field.is_complex():
-            allow_json_failure = False
-        elif (
-            is_union(get_origin(field.type_))
-            and field.sub_fields
-            and any(f.is_complex() for f in field.sub_fields)
-        ):
-            allow_json_failure = True
-        else:
-            return False, False
-
-        return True, allow_json_failure
-
-    def _explode_ssm_values(
-        self, field: ModelField, env_vars: Mapping[str, Optional[str]]
-    ) -> Dict[str, Any]:
-        """
-        Process env_vars and extract the values of keys containing
-        env_nested_delimiter into nested dictionaries.
-
-        This is applied to a single field, hence filtering by env_var prefix.
-        """
-        prefixes = [
-            f"{env_name}{self.env_nested_delimiter}"
-            for env_name in field.field_info.extra["env_names"]
-        ]
-        result: Dict[str, Any] = {}
-        for env_name, env_val in env_vars.items():
-            if not any(env_name.startswith(prefix) for prefix in prefixes):
-                continue
-            _, *keys, last_key = env_name.split(self.env_nested_delimiter)
-            env_var = result
-            for key in keys:
-                env_var = env_var.setdefault(key, {})
-            env_var[last_key] = env_val
-
-        return result
-
     def __repr__(self) -> str:
-        return f"AwsSsmSettingsSource(ssm_prefix={self.ssm_prefix!r})"
+        return f"AwsSsmSettingsSource(ssm_path={self._ssm_path!r}, ssm_client={self._ssm_client!r})"
