@@ -15,6 +15,7 @@ dev = [
   "pre-commit>=4.1.0",
   "pytest>=8.3.4",
   "moto[all]>=5.0.28",
+  "pytest-cov>=6.0.0",
 ]
 
 [tool.semantic_release]
