@@ -1,6 +1,18 @@
 # CHANGELOG
 
 
+## v1.1.1 (2025-02-05)
+
+### Bug Fixes
+
+- **ci**: Adapt workflow for Python Semantic Release v7 -> v9
+  ([`59e46c9`](https://github.com/developmentseed/pydantic-ssm-settings/commit/59e46c9c83e5b600038360b0d5ce30475482e2bb))
+
+Python Semantic Release V8 brought changes where releases were no longer pushed to Github/PyPI. As
+  such, we need to update our workflows.
+  https://python-semantic-release.readthedocs.io/en/latest/migrating_from_v7.html
+
+
 ## v1.1.0 (2025-02-04)
 
 ### Bug Fixes
