@@ -60,7 +60,7 @@ jobs:
     needs: [test, lint]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           # You must set fetch-depth to 0 when using actions/checkout@v2, since
           # Python Semantic Release needs access to the full history to
@@ -70,6 +70,19 @@ jobs:
       - run: pip install packaging
 
       - name: Python Semantic Release
+        id: release
         uses: python-semantic-release/python-semantic-release@v9.17.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        # NOTE: DO NOT wrap the conditional in ${{ }} as it will always evaluate to true.
+        # See https://github.com/actions/runner/issues/1173
+        if: steps.release.outputs.released == 'true'
+
+      - name: Publish package distributions to GitHub Releases
+        uses: python-semantic-release/upload-to-gh-release@v8.7.0
+        if: steps.release.outputs.released == 'true'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
