@@ -3,6 +3,9 @@ name: CI
 on:
   push:
 
+permissions:
+  id-token: write
+
 jobs:
   lint:
     runs-on: ubuntu-latest
