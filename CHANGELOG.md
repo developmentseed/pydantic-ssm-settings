@@ -1,6 +1,17 @@
 # CHANGELOG
 
 
+## v1.1.2 (2025-02-05)
+
+### Bug Fixes
+
+- **ci**: Add required permission
+  ([`15592ee`](https://github.com/developmentseed/pydantic-ssm-settings/commit/15592eea7d8cc5d268ec4a6b5e11da744cd54114))
+
+- **ci**: Expand permissions
+  ([`be82941`](https://github.com/developmentseed/pydantic-ssm-settings/commit/be829419e680c28ea23f85298b77579e291cabe4))
+
+
 ## v1.1.1 (2025-02-05)
 
 ### Bug Fixes
