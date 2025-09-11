@@ -48,7 +48,7 @@ class SsmBaseSettings(BaseSettings):
         # NOTE: Need a direct access to the attributes dictionary to avoid raising an AttributeError: __pydantic_private__ exception
         self.__dict__["__ssm_prefix"] = _ssm_prefix
         self.__dict__["__ssm_client"] = _ssm_client
-        super().__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def settings_customise_sources(
         self,
